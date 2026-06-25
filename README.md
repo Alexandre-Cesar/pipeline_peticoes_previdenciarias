@@ -51,10 +51,10 @@ pipeline_peticoes_previdenciarias/
 │   ├── 01-bronze/
 │   │   └── pdf_to_br_documentos                    # Extração do texto bruto dos PDFs (Bronze)
 │   ├── 02-silver/
-│   │   ├── br_sl_indeferimento                     # Extração dos dados da carta de indeferimento
-│   │   ├── br_sl_laudo                             # Extração dos dados do laudo médico
-│   │   ├── br_sl_residencia                        # Extração dos dados do comprovante de residência
-│   │   └── br_sl_rg                                # Extração dos dados do RG
+│   │   ├── br_sl_indeferimento                     # Tratamento e enriquecimento dos dados da carta de indeferimento
+│   │   ├── br_sl_laudo                             # Tratamento e enriquecimento dos dados do laudo médico
+│   │   ├── br_sl_residencia                        # Tratamento e enriquecimento dos dados do comprovante de residência
+│   │   └── br_sl_rg                                # Tratamento e enriquecimento dos dados do RG
 │   ├── 03-gold/
 │   │   └── sl_gl_caso_previdenciario               # Consolidação de todos os dados (Gold)
 │   └── peticao                                     # Geração da petição via LLM
