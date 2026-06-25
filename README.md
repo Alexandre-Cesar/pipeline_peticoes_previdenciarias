@@ -1,170 +1,175 @@
-# Desafio Técnico – Geração Automática de Petições Previdenciárias
+# Pipeline de Geração Automática de Petições Previdenciárias
+
+![Python](https://img.shields.io/badge/Python-3.10+-blue?logo=python&logoColor=white)
+![Databricks](https://img.shields.io/badge/Databricks-Community%20Edition-red?logo=databricks&logoColor=white)
+![Apache Spark](https://img.shields.io/badge/Apache%20Spark-PySpark-orange?logo=apachespark&logoColor=white)
+![OpenAI](https://img.shields.io/badge/LLM-OpenAI%20GPT-412991?logo=openai&logoColor=white)
+![Status](https://img.shields.io/badge/status-concluído-brightgreen)
+
+---
 
 ## Objetivo
 
-O objetivo deste projeto é automatizar o processamento de documentos utilizados em processos previdenciários, realizando a extração das informações relevantes, consolidando os dados em uma única estrutura e, por fim, gerando automaticamente uma petição inicial utilizando um modelo de linguagem (LLM).
+Automatizar o processamento de documentos previdenciários: extração de informações relevantes, consolidação estruturada dos dados e geração automática de petição inicial utilizando um modelo de linguagem (LLM).
 
-A solução foi desenvolvida utilizando Databricks Community Edition, Apache Spark e Python.
-
----
-
-# Ferramentas Utilizadas
-
-## Databricks Community Edition
-
-Utilizado como ambiente principal de desenvolvimento, responsável pela execução dos notebooks, processamento distribuído e armazenamento das tabelas.
-
-## Apache Spark / PySpark
-
-Responsável pelo processamento dos dados, transformação das informações extraídas e construção das tabelas Bronze, Silver e Gold.
-
-## Regex
-
-Toda a extração das informações dos documentos foi realizada através de expressões regulares.
-
-Os padrões foram centralizados em um único arquivo de configuração (`documentos.json`), facilitando futuras manutenções sem necessidade de alterar o código.
-
-## JSON
-
-Após a consolidação dos dados, o registro é convertido para JSON para servir como entrada para o modelo de IA responsável pela geração da petição.
-
-## OpenAI GPT
-
-Responsável por gerar automaticamente uma nova petição utilizando os dados estruturados do processo e mantendo a estrutura do modelo de referência.
-
-> **Observação:** A integração foi implementada, porém a execução da API não foi realizada devido à ausência de créditos disponíveis para utilização da API da OpenAI.
-
-## python-docx
-
-Biblioteca utilizada para gerar automaticamente o documento final em formato `.docx`.
+O fluxo recebe documentos reais do cliente (RG, comprovante de residência, laudo médico, carta de indeferimento do INSS) e entrega uma petição estruturada em `.docx`, pronta para revisão do advogado.
 
 ---
 
-# Raciocínio Utilizado
+## Resultado Final
 
-Inicialmente foi considerada a possibilidade de enviar diretamente todos os documentos para um modelo de IA.
+O arquivo [`peticao_joao_da_silva.docx`](./peticao_joao_da_silva.docx) na raiz do repositório é o output gerado pelo pipeline para o cliente fictício João da Silva, utilizando a petição da cliente Maria como referência de estrutura e fundamentação jurídica.
 
-Entretanto, essa abordagem apresentava algumas desvantagens:
-
-* maior consumo de tokens;
-* dificuldade de auditoria dos dados utilizados;
-* baixa reutilização das informações extraídas;
-* dependência integral do modelo para interpretar os documentos.
-
-Por esse motivo, foi adotada uma arquitetura baseada em pipeline de dados.
-
-Cada documento é processado individualmente, permitindo extrair apenas as informações relevantes através de Regex.
-
-Posteriormente essas informações são consolidadas em uma única tabela (Gold), contendo todos os dados necessários para geração da petição.
-
-Dessa forma, o modelo de IA recebe apenas dados estruturados, reduzindo o volume de informações enviadas e aumentando a previsibilidade da resposta.
+> **Importante:** o fluxo não realiza simples substituição de nomes. O prompt foi construído para que o LLM gere uma fundamentação adequada à profissão e ao diagnóstico específico de João da Silva, distinguindo-se do caso da Maria.
 
 ---
 
-# Fluxo do Pipeline
+## Arquitetura
 
-```text
-PDFs
-    │
-    ▼
-Extração do texto
-    │
-    ▼
-Camada Bronze
-(Texto bruto)
-    │
-    ▼
-Regex
-    │
-    ▼
-Camada Silver
-(Tabelas específicas)
-    │
-    ▼
-Junção dos documentos
-    │
-    ▼
-Camada Gold
-(Tabela consolidada)
-    │
-    ▼
-JSON
-    │
-    ▼
-LLM
-    │
-    ▼
-Petição em DOCX
+O pipeline foi baseado na **arquitetura Medallion** (Bronze → Silver → Gold), aplicada a documentos jurídicos:
+
+
+![Databricks Job](images/pipeline_diagram.png)
+
+
+---
+
+## Estrutura do Repositório
+
+```
+pipeline_peticoes_previdenciarias/
+│
+├── configs/
+│   └── documentos.json                              # Padrões Regex centralizados por tipo de documento
+│
+├── files/                                           # Documentos de entrada (PDFs fictícios do cliente)
+│
+├── images/
+│   └── pipeline_diagram.png                        # Diagrama visual do pipeline
+│
+├── notebooks/
+│   ├── 01-bronze/
+│   │   └── pdf_to_br_documentos                    # Extração do texto bruto dos PDFs (Bronze)
+│   ├── 02-silver/
+│   │   ├── br_sl_indeferimento                     # Extração dos dados da carta de indeferimento
+│   │   ├── br_sl_laudo                             # Extração dos dados do laudo médico
+│   │   ├── br_sl_residencia                        # Extração dos dados do comprovante de residência
+│   │   └── br_sl_rg                                # Extração dos dados do RG
+│   ├── 03-gold/
+│   │   └── sl_gl_caso_previdenciario               # Consolidação de todos os dados (Gold)
+│   └── peticao                                     # Geração da petição via LLM
+│
+├── output/
+│   └── peticao_joao_da_silva.docx                  # Petição final gerada pelo pipeline
+│
+├── prompts/
+│   └── peticao_auxilio_acidente.txt                # Prompt utilizado na chamada ao LLM
+│
+├── template/
+│   └── Peticao_MODELO_Auxilio_Doenca_Maria_da_Silva_2026-06-22.docx   # Modelo de referência
+│
+└── README.md
 ```
 
+## Ferramentas Utilizadas
+ 
+| Ferramenta | Papel no pipeline |
+|---|---|
+| **Databricks Community Edition** | Ambiente de desenvolvimento e execução dos notebooks |
+| **Apache Spark / PySpark** | Processamento e transformação dos dados entre camadas |
+| **pdfplumber** | Extração de texto dos documentos PDF |
+| **Regex** | Extração estruturada das informações por tipo de documento |
+| **OpenAI GPT** | Geração da petição a partir dos dados estruturados |
+| **python-docx** | Exportação do resultado final em formato `.docx` |
+ 
+> **Nota sobre a API OpenAI:** a integração foi implementada e o prompt está disponível na pasta `prompts/`. A execução não foi realizada neste ambiente por ausência de créditos disponíveis, mas toda a estrutura de chamada está pronta para ser executada com uma chave válida.
+ 
 ---
-
-# Orquestração
-
-O pipeline foi projetado para execução automática utilizando **Databricks Workflows**.
-
-Cada notebook representa uma etapa independente do processamento.
-
-Fluxo sugerido da orquestração:
-
-1. Extração dos PDFs
-2. Processamento do RG
-3. Processamento do Comprovante de Residência
-4. Processamento do Laudo Médico
-5. Processamento da Carta de Indeferimento
-6. Consolidação da camada Gold
-7. Conversão para JSON
-8. Geração da Petição
-9. Geração do arquivo `.docx`
-
-Caso novos documentos sejam adicionados ao ambiente, basta executar novamente o Workflow para que todas as tabelas sejam atualizadas automaticamente.
-
+ 
+## Como Executar
+ 
+### Pré-requisitos
+ 
+- Conta no [Databricks Community Edition](https://community.cloud.databricks.com/)
+- Chave de API da OpenAI (para o notebook de geração da petição)
+- Cluster Databricks com Python 3.10+ e as bibliotecas abaixo instaladas:
+```
+pdfplumber
+openai
+python-docx
+```
+ 
+### Configuração
+ 
+1. Faça o upload dos arquivos da pasta `files/` para o DBFS (ex.: `dbfs:/FileStore/peticoes/joao/`)
+2. Ajuste os caminhos nos notebooks conforme o destino escolhido
+3. Insira sua chave da OpenAI no notebook `peticao` ou configure como secret no Databricks
+### Execução
+ 
+Configure um **Databricks Workflow** seguindo a ordem abaixo, ou execute manualmente nessa sequência:
+ 
+```
+01-bronze/pdf_to_br_documentos
+        ↓
+02-silver/br_sl_indeferimento   (paralelo)
+02-silver/br_sl_laudo           (paralelo)
+02-silver/br_sl_residencia      (paralelo)
+02-silver/br_sl_rg              (paralelo)
+        ↓
+03-gold/sl_gl_caso_previdenciario
+        ↓
+peticao
+```
+ 
+O arquivo `.docx` será salvo na pasta `output/` ao final da execução.
+ 
 ---
-
-# O que Funcionou Bem
-
-Durante o desenvolvimento alguns pontos se destacaram positivamente:
-
-* Separação da solução em camadas (Bronze, Silver e Gold);
-* Centralização de todos os Regex em um arquivo de configuração;
-* Facilidade para adicionar novos tipos de documentos;
-* Construção de uma tabela Gold consolidada contendo todas as informações necessárias para geração da petição;
-* Geração automática do documento Word.
-
-Essa arquitetura também facilita futuras integrações com outras soluções de IA, já que o modelo recebe um JSON estruturado ao invés dos documentos originais.
-
+ 
+## Raciocínio da Solução
+ 
+A primeira alternativa considerada foi enviar todos os documentos diretamente ao LLM. Essa abordagem foi descartada pelos seguintes motivos:
+ 
+- maior consumo de tokens e custo por requisição
+- menor previsibilidade e rastreabilidade da resposta
+- dificuldade de auditoria dos dados utilizados
+- reprocessamento desnecessário a cada nova chamada
+A solução adotada separa processamento de dados de geração de texto. O LLM recebe apenas um JSON estruturado com as informações consolidadas — não os documentos brutos — o que reduz o volume enviado e aumenta a consistência da saída.
+ 
+Essa arquitetura também facilita futuras trocas de modelo (GPT → Claude → Gemini) sem alteração no pipeline de dados.
+ 
 ---
-
-# Dificuldades Encontradas
-
-A principal dificuldade foi relacionar os diferentes documentos.
-
-Nem todos os documentos continham um identificador único (como CPF).
-
-Foi necessário criar uma estratégia de relacionamento utilizando os dados disponíveis em cada documento, realizando a consolidação das informações antes da geração da tabela Gold.
-
-Outro desafio foi lidar com pequenas variações nos layouts dos documentos, tornando necessário criar Regex mais robustos.
-
+ 
+## O que Funcionou Bem
+ 
+- A separação em camadas Medallion tornou o pipeline fácil de depurar e auditar
+- Centralizar os Regex em `documentos.json` simplificou a manutenção e a adição de novos tipos de documento
+- A tabela Gold consolidada funcionou bem como contrato entre o pipeline de dados e o LLM
+- A geração do `.docx` com python-docx entregou um resultado diretamente utilizável pelo escritório
 ---
-
-# Melhorias Futuras
-
-Com mais tempo, algumas melhorias poderiam ser implementadas:
-
-* Utilização de OCR especializado para documentos digitalizados;
-* Validação automática dos dados extraídos (ex.: validação de CPF e datas);
-* Substituição parcial das Regex por modelos de Document AI para maior flexibilidade;
-* Integração completa com a API da OpenAI para geração automática da petição sem intervenção manual;
-* Criação de testes automatizados para os Regex;
-* Inclusão de monitoramento e tratamento de erros durante a execução do Workflow;
-* Versionamento dos modelos de petição e dos prompts utilizados pelo LLM.
-
+ 
+## Dificuldades Encontradas
+ 
+**Relacionamento entre documentos:** nem todos os documentos continham um identificador único (como CPF). Foi necessário criar uma estratégia de join baseada nos dados comuns disponíveis em cada documento antes de consolidar a camada Gold.
+ 
+**Variações de layout nos PDFs:** pequenas diferenças na formatação exigiram a criação de expressões regulares mais robustas, que cobrem múltiplos formatos possíveis para um mesmo campo.
+ 
 ---
-
-# Considerações Finais
-
-A solução proposta prioriza a separação entre processamento de dados e geração de texto.
-
-O pipeline produz uma camada estruturada contendo todas as informações relevantes do processo, permitindo que diferentes modelos de IA sejam utilizados futuramente sem necessidade de alterar o processamento dos documentos.
-
-Essa abordagem torna a solução mais escalável, auditável e de fácil manutenção, além de reduzir significativamente o volume de dados enviados ao modelo de linguagem.
+ 
+## Melhorias Futuras
+ 
+Com mais tempo, as seguintes melhorias podem ser implementadas:
+ 
+- **OCR especializado** para documentos digitalizados ou de baixa qualidade
+- **Validação automática** dos dados extraídos (CPF, datas, CID)
+- **Document AI** (Google Document AI ou AWS Textract) para substituir Regex em campos de maior variabilidade
+- **Testes automatizados** para os padrões Regex, garantindo cobertura de diferentes layouts
+- **Versionamento de prompts**, mantendo histórico das versões utilizadas para geração das petições
+- **Monitoramento do Workflow** com alertas em caso de falha por etapa
+- **Interface web simples** para upload dos documentos e download da petição gerada, sem necessidade de acesso ao Databricks
+---
+ 
+## Considerações Finais
+ 
+A solução priorizou rastreabilidade e separação de responsabilidades. O pipeline produz uma camada estruturada que pode alimentar qualquer modelo de IA futuramente, sem precisar reprocessar os documentos originais.
+ 
+Essa abordagem torna a solução mais escalável, auditável e de fácil manutenção — características importantes para um escritório que processará múltiplos casos com volumes crescentes de documentos.
