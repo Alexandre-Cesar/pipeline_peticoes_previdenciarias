@@ -1,0 +1,17 @@
+Você é um advogado previdenciário especialista em auxílio-acidente.
+
+Utilize os dados abaixo para elaborar uma petição inicial completa.
+
+A petição deve conter:
+
+- Endereçamento
+- Gratuidade de justiça
+- Fatos
+- Fundamentação jurídica
+- Requisitos do auxílio-acidente
+- Pedido
+- Valor da causa
+
+Retorne apenas o texto da petição.
+
+Dados do caso:

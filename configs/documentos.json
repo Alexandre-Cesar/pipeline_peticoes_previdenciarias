@@ -1,0 +1,43 @@
+{"rg":{
+    "rg": "REGISTRO\\s+GERAL\\s*\\(RG\\)\\s+([\\d.\\-Xx]+)",
+    "data_expedicao": "DATA\\s+DE\\s+EXPEDIÇÃO\\s+(\\d{2}/\\d{2}/\\d{4})",
+    "nome": "NOME\\s+(.*?)\\s+FILIAÇÃO",
+    "filiacao": "FILIAÇÃO\\s+(.*?)\\s+DATA\\s+DE\\s+NASCIMENTO",
+    "data_nascimento": "DATA\\s+DE\\s+NASCIMENTO\\s+(\\d{2}/\\d{2}/\\d{4})",
+    "naturalidade": "NATURALIDADE\\s+(.*?)\\s+CPF",
+    "cpf": "CPF\\s+(\\d{3}\\.?\\d{3}\\.?\\d{3}-?\\d{2})"
+},
+"residencia":{
+    "cpf": "(?:C[Pp][Ff]\\s*[:\\-]?\\s*)?(\\d{3}[.\\s]?\\d{3}[.\\s]?\\d{3}[-\\s]?\\d{2})",
+    "endereco": "ENDEREÇO:\\s*(.*?)\\s*CIDADE\\/UF:",
+    "cidade_uf": "CIDADE\\/UF:\\s*(.*?)\\s*CEP:",
+    "cep": "CEP:\\s*(\\d{2}\\.\\d{3}-\\d{3})",
+    "numero_cliente": "NÚMERO\\s+DO\\s+CLIENTE:\\s*([\\d\\-]+)",
+    "mes_referencia": "MÊS\\s+DE\\s+REFERÊNCIA:\\s*([A-ZÇÃÕa-zçãõ]+\\/\\d{4})",
+    "vencimento": "VENCIMENTO:\\s*(\\d{2}\\/\\d{2}\\/\\d{4})",
+    "valor": "VALOR:\\s*R\\$\\s*([\\d\\.]+,\\d{2})"
+},
+"indeferimento":{
+    "cpf": "(?:C[Pp][Ff]\\s*[:\\-]?\\s*)?(\\d{3}[.\\s]?\\d{3}[.\\s]?\\d{3}[-\\s]?\\d{2})",
+    "status": "PEDIDO\\s+DE\\s+BENEFÍCIO\\s+FOI:\\s*(DEFERIDO|INDEFERIDO)",
+    "motivo": "MOTIVO:\\s*(.*?)\\s*CASO\\s+NÃO\\s+CONCORDE",
+    "numero_beneficio": "NÚMERO\\s+DO\\s+BENEFÍCIO\\s*\\(NB\\):\\s*([\\d.-]+)",
+    "especie_requerida": "ESPÉCIE\\s+REQUERIDA:\\s*(.*?)\\s*DATA\\s+DE\\s+ENTRADA",
+    "der": "DATA\\s+DE\\s+ENTRADA\\s+DO\\s+REQUERIMENTO\\s*\\(DER\\):\\s*(\\d{2}/\\d{2}/\\d{4})",
+    "data_pericia": "DATA\\s+DA\\s+PERÍCIA:\\s*(\\d{2}/\\d{2}/\\d{4})"
+},
+"laudo":{
+    "nome": "PACIENTE:?\\s*(.*?)\\s*DATA\\s+DE\\s+NASCIMENTO",
+    "data_nascimento": "DATA\\s+DE\\s+NASCIMENTO\\s*:?\\s*(\\d{2}/\\d{2}/\\d{4})",
+    "profissao": "PROFISSÃO:\\s*(.*?)\\s*DATA\\s+DO\\s+ATENDIMENTO",
+    "data_atendimento": "DATA\\s+DO\\s+ATENDIMENTO:\\s*(\\d{2}/\\d{2}/\\d{4})",
+    "medico_responsavel": "MÉDICO\\s+RESPONSÁVEL:\\s*(.*?)\\s*-\\s*CRM",
+    "crm": "(CRM-[A-Z]{2}\\s*[\\d.]+)",
+    "especialidade": "ESPECIALIDADE:\\s*(.*?)\\s*HISTÓRICO",
+    "historico": "HISTÓRICO:\\s*(.*?)\\s*EXAME\\s+FÍSICO\\s+E\\s+CONCLUSÃO",
+    "conclusao": "EXAME\\s+FÍSICO\\s+E\\s+CONCLUSÃO:\\s*(.*?)\\s*CID-10:",
+    "cid10": "CID-10:\\s*([A-Z]\\d{2}\\.\\d+)",
+    "descricao_cid": "CID-10:\\s*[A-Z]\\d{2}\\.\\d+\\s*\\((.*?)\\)"
+}
+
+}
