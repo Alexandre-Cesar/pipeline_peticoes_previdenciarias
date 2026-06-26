@@ -29,7 +29,7 @@ O arquivo [`peticao_joao_da_silva.docx`](./peticao_joao_da_silva.docx) na raiz d
 O pipeline foi baseado na **arquitetura Medallion** (Bronze → Silver → Gold), aplicada a documentos jurídicos:
 
 
-![Databricks Job](images/pipeline_diagram.png)
+![Databricks Job](images/pipeline_diagram.png) 
 
 
 ---
